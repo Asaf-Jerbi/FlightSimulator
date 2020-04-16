@@ -38,6 +38,7 @@ namespace FlightSimulatorApp.ViewModel
         {
             this.model.connect(Ip, Port);
             this.model.start();
+            this.model.startSetThread();
         }
 
 
