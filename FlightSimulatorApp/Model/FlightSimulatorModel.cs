@@ -31,6 +31,8 @@ namespace FlightSimulatorApp.Model
         private string altimeterIndicatedAltitudeFt;
         private string planeOutOfMap;
         private bool outOfMap;
+        private bool isConnected;
+
         // UI errors values.
         private string slowness;
 
@@ -54,6 +56,10 @@ namespace FlightSimulatorApp.Model
         public void connect(string ip, int port)
         {
             this.telnetClient.connect(ip, port);
+            if(telnetClient.isConnected() == true)
+            {
+                isConnected = true;
+            }
         }
 
         /// <summary>
@@ -84,11 +90,7 @@ namespace FlightSimulatorApp.Model
                         Location = new Location(latitude, longtitude);
                         // Sleeping - so the server won't be overloaded. 
                         Thread.Sleep(250);
-                        //execute the commands
-                        while(this.myQueue.Count != 0) {
-                            string cmd = this.myQueue.Dequeue();
-                            telnetClient.write(cmd);
-                        }
+                        
                         // If Slowness error message apppears (stopwatch turned on)
                         // show the slowness message for 5 seconds and then remove it.
                         if (stopwatch.ElapsedMilliseconds > 5000)
@@ -120,12 +122,29 @@ namespace FlightSimulatorApp.Model
             });
             srartThread.Start();
         }
+        public void startSetThread()
+        {
+            new Thread(delegate ()
+            {
+                while (isConnected)
+                {
+                    //execute the commands
+
+                    while (this.myQueue.Count != 0)
+                    {
+                        string cmd = this.myQueue.Dequeue();
+                        telnetClient.write(cmd);
+                    }
+                }
+            }).Start();
+        }
 
         /// <summary>
         /// Disconnection method.
         /// </summary>
         public void disconnect()
         {
+            this.isConnected = false;
             this.telnetClient.disconnect();
         }
 

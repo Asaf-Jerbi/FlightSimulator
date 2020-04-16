@@ -16,6 +16,7 @@ namespace FlightSimulatorApp.Model
         void disconnect();
         void start();
         void set(string varName, double value);
+        void startSetThread();
 
         // Properties:
         string Rudder { get; set; }
